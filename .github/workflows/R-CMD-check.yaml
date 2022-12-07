@@ -36,7 +36,10 @@ jobs:
       - uses: n1hility/cancel-previous-runs@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Get Cache Variables
+          run: |
+            echo "CMDSTANR_PATH=${HOME}/.cmdstanr" >> $GITHUB_ENV
+          shell: bash
       - uses: r-lib/actions/setup-pandoc@v2
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -67,6 +70,11 @@ jobs:
             any::XML
             any::textshaping
 
+      - name: Cache CmdStan
+          uses: actions/cache@v2
+          with:
+            path: ${{env.CMDSTAN_PATH}}
+            key: CmdStan-${{runner.os}}
       - name: Install CmdStanR
         run: |
           cmdstanr::check_cmdstan_toolchain(fix = TRUE)
