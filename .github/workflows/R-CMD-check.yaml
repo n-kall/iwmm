@@ -73,7 +73,7 @@ jobs:
       - name: Cache CmdStan
         uses: actions/cache@v2
         with:
-          path: ${{env.CMDSTAN_PATH}}
+          path: ${{env.CMDSTANR_PATH}}
           key: CmdStan-${{runner.os}}
       - name: Install CmdStanR
         run: |
