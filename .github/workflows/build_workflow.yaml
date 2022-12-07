@@ -1,12 +1,12 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
-  workflow_run:
-    workflows: ["build"]
-    types:
-      - completed
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 
-name: R-CMD-check
+name: build
 
 jobs:
   R-CMD-check:
@@ -41,8 +41,3 @@ jobs:
           os: matrix.config.os
           r: matrix.config.r
           rtools: matrix.config.rtools
-
-      - uses: r-lib/actions/check-r-package@v2
-        with:
-          build_args: 'c("--no-manual", "--no-build-vignettes")'
-          args: 'c("--no-manual", "--as-cran", "--ignore-vignettes")'
