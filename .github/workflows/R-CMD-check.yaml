@@ -36,13 +36,11 @@ jobs:
       - uses: n1hility/cancel-previous-runs@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build action call
-        id: local-action
-        uses: ./.github/actions/run_build
+      - uses: ./.github/actions/build
         with:
-          os: matrix.config.os
-          r: matrix.config.r
-          rtools: matrix.config.rtools
+          os: ${{ matrix.config.os }}
+          r: ${{ matrix.config.r }}
+          rtools: ${{ matrix.config.rtools }}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
