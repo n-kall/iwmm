@@ -74,7 +74,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{env.CMDSTANR_PATH}}
-          key: CmdStan-${{runner.os}}
+          key: CmdStanR-${{runner.os}}
       - name: Install CmdStanR
         run: |
           cmdstanr::check_cmdstan_toolchain(fix = TRUE)
