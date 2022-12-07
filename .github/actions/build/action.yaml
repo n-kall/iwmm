@@ -1,5 +1,7 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+name: "build"
+
 inputs:
   os:
     required: true
@@ -11,73 +13,59 @@ inputs:
     required: true
     type: string
 
-name: run build
+runs:
+  using: "composite"
+  steps:
+    - uses: n1hility/cancel-previous-runs@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get Cache Variables
+      run: |
+        echo "CMDSTANR_PATH=${HOME}/.cmdstanr" >> $GITHUB_ENV
+      shell: bash
+    - uses: r-lib/actions/setup-pandoc@v2
+    - uses: r-lib/actions/setup-r@v2
+      with:
+        r-version: ${{ inputs.r }}
+        use-public-rspm: true
+        rtools-version: ${{ inputs.rtools }}
 
-jobs:
-  build:
-    runs-on: ${{ inputs.os }}
+    # packages that are needed for R CMD CHECK
+    - uses: r-lib/actions/setup-r-dependencies@v2
+      with:
+        cache-version: 1
+        extra-packages: |
+          stan-dev/cmdstanr
+          rcmdcheck
+          checkmate
+          jsonlite
+          posterior
+          processx
+          R6
+          BH
+          RcppEigen
+          StanHeaders
+          RcppParallel
+          withr
+          testthat
+          rmarkdown
+          knitr
+          any::XML
+          any::textshaping
 
-    name: ${{ inputs.os }} (${{ inputs.r }})
-
-    strategy:
-      fail-fast: false
-
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      R_KEEP_PKG_SOURCE: yes
-      NOT_CRAN: true
-
-    steps:
-      - uses: n1hility/cancel-previous-runs@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get Cache Variables
-        run: |
-          echo "CMDSTANR_PATH=${HOME}/.cmdstanr" >> $GITHUB_ENV
-        shell: bash
-      - uses: r-lib/actions/setup-pandoc@v2
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          r-version: ${{ inputs.r }}
-          use-public-rspm: true
-          rtools-version: ${{ inputs.rtools }}
-
-      # packages that are needed for R CMD CHECK
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          cache-version: 1
-          extra-packages: |
-            stan-dev/cmdstanr
-            rcmdcheck
-            checkmate
-            jsonlite
-            posterior
-            processx
-            R6
-            BH
-            RcppEigen
-            StanHeaders
-            RcppParallel
-            withr
-            testthat
-            rmarkdown
-            knitr
-            any::XML
-            any::textshaping
-
-      - name: Cache CmdStan
-        uses: actions/cache@v2
-        with:
-          path: ${{env.CMDSTANR_PATH}}
-          key: CmdStanR-${{runner.os}}
-      - name: Install CmdStanR
-        run: |
-          cmdstanr::check_cmdstan_toolchain(fix = TRUE)
-          cmdstanr::install_cmdstan(cores = parallel::detectCores())
-        shell: Rscript {0}
-      - name: Install Development RStan on Windows
-        if: runner.os == 'Windows'
-        run: |
-          Sys.setenv(MAKEFLAGS=paste0("-j",parallel::detectCores()))
-          install.packages(c("StanHeaders", "rstan"), repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-        shell: Rscript {0}
+    - name: Cache CmdStan
+      uses: actions/cache@v2
+      with:
+        path: ${{env.CMDSTANR_PATH}}
+        key: CmdStanR-${{runner.os}}
+    - name: Install CmdStanR
+      run: |
+        cmdstanr::check_cmdstan_toolchain(fix = TRUE)
+        cmdstanr::install_cmdstan(cores = parallel::detectCores())
+      shell: Rscript {0}
+    - name: Install Development RStan on Windows
+      if: runner.os == 'Windows'
+      run: |
+        Sys.setenv(MAKEFLAGS=paste0("-j",parallel::detectCores()))
+        install.packages(c("StanHeaders", "rstan"), repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+      shell: Rscript {0}
