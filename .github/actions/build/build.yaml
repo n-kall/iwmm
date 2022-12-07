@@ -33,8 +33,6 @@ jobs:
       NOT_CRAN: true
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: ./actions/local-action
       - uses: n1hility/cancel-previous-runs@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

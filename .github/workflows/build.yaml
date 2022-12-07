@@ -36,7 +36,7 @@ jobs:
       - uses: n1hility/cancel-previous-runs@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: ./.github/workflows/run_build.yml
+      - uses: ./.github/actions/build
         with:
           os: matrix.config.os
           r: matrix.config.r
