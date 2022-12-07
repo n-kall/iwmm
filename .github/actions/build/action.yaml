@@ -16,9 +16,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: n1hility/cancel-previous-runs@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Get Cache Variables
       run: |
         echo "CMDSTANR_PATH=${HOME}/.cmdstanr" >> $GITHUB_ENV
