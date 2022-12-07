@@ -5,7 +5,7 @@ on:
 name: lint create cache
 
 jobs:
-  lint:
+  lint-build:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

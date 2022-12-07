@@ -9,7 +9,7 @@ on:
 name: test-coverage create cache
 
 jobs:
-  test-coverage:
+  test-coverage-build:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
