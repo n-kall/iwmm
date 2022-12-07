@@ -1,0 +1,25 @@
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+name: test cache
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: create file
+        run: |
+          cat "Hello World!" > hello.txt
+      - name: Cache file
+        uses: actions/cache@v2
+        with:
+          path: ${{hello.txt}}
+          key: Hello
+
+
