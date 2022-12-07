@@ -13,10 +13,6 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
-      - name: Get Cache Variables
-        run: |
-          echo "CMDSTANR_PATH=${HOME}/.cmdstanr" >> $GITHUB_ENV
-        shell: bash
       - name: create file
         run: |
           echo "Hello World!" > hello.txt
@@ -24,7 +20,7 @@ jobs:
       - name: Cache file
         uses: actions/cache@v2
         with:
-          path: ${{hello.txt}}
+          path: hello.txt
           key: Hello
 
 
