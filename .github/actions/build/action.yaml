@@ -1,20 +1,15 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/master/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-on:
-  workflow_call:
-    inputs:
-      os:
-        required: true
-        type: string
-      r:
-        required: true
-        type: string
-      rtools:
-        required: true
-        type: string
-    secrets:
-      envPAT:
-        required: true
+inputs:
+  os:
+    required: true
+    type: string
+  r:
+    required: true
+    type: string
+  rtools:
+    required: true
+    type: string
 
 name: run build
 
