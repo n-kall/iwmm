@@ -16,6 +16,7 @@ jobs:
       - name: create file
         run: |
           cat "Hello World!" > hello.txt
+        shell: bash
       - name: Cache file
         uses: actions/cache@v2
         with:
