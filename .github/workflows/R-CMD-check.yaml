@@ -37,9 +37,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Get Cache Variables
-          run: |
-            echo "CMDSTANR_PATH=${HOME}/.cmdstanr" >> $GITHUB_ENV
-          shell: bash
+        run: |
+          echo "CMDSTANR_PATH=${HOME}/.cmdstanr" >> $GITHUB_ENV
+        shell: bash
       - uses: r-lib/actions/setup-pandoc@v2
       - uses: r-lib/actions/setup-r@v2
         with:
