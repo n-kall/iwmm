@@ -36,13 +36,21 @@ jobs:
 
       - name: Cache CmdStan
         uses: actions/cache@v2
+        id: cache-cmdstanr
         with:
           path: ${{env.CMDSTANR_PATH}}
           key: CmdStanR-${{runner.os}}
       - name: Install CmdStanR
+        if: steps.cache-cmdstanr.outputs.cache-hit != 'true'
         run: |
           cmdstanr::check_cmdstan_toolchain(fix = TRUE)
           cmdstanr::install_cmdstan(cores = parallel::detectCores())
+        shell: Rscript {0}
+      - name: Install Development RStan on Windows
+        if: runner.os == 'Windows'
+        run: |
+          Sys.setenv(MAKEFLAGS=paste0("-j",parallel::detectCores()))
+          install.packages(c("StanHeaders", "rstan"), repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
         shell: Rscript {0}
 
       - name: Test coverage

@@ -52,10 +52,12 @@ runs:
 
     - name: Cache CmdStan
       uses: actions/cache@v2
+      id: cache-cmdstanr
       with:
         path: ${{env.CMDSTANR_PATH}}
         key: CmdStanR-${{runner.os}}
     - name: Install CmdStanR
+      if: steps.cache-cmdstanr.outputs.cache-hit != 'true'
       run: |
         cmdstanr::check_cmdstan_toolchain(fix = TRUE)
         cmdstanr::install_cmdstan(cores = parallel::detectCores())
