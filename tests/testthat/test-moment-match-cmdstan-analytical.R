@@ -1,7 +1,7 @@
-cmdstanr_available = require(cmdstanr)
+cmdstanr_available <- require(cmdstanr)
 
 # Run these tests only if cmdstanr is installed
-if(cmdstanr_available){
+if(cmdstanr_available) {
 
 
 stancode <- "data {
