@@ -115,9 +115,16 @@ moment_match.matrix <- function(x,
            target density is equal to your proposal density.")
     }
 
+
     lw_psis <- suppressWarnings(loo::psis(lw))
     lw <- as.vector(weights(lw_psis))
     k <- lw_psis$diagnostics$pareto_k
+
+#    lw_psis <- posterior::pareto_smooth(exp(lw), tail = "right", extra_diags = TRUE)
+#    lw <- log(lw_psis$x)
+#    k <- lw_psis$diagnostics$k
+
+
     if (any(is.infinite(k))) {
       stop("Something went wrong, and encountered infinite Pareto k values..")
     }
@@ -153,6 +160,12 @@ moment_match.matrix <- function(x,
     psisf <- suppressWarnings(loo::psis(lwf))
     kf <- psisf$diagnostics$pareto_k
 
+#    psisfp <- posterior:::pareto_smooth(exp(lwf), tail = "right", extra_diags = TRUE, r_eff = 1)
+ #   kfp <- psisf$diagnostics$k
+
+#    print(kf)
+#    print(kfp)
+
     if (split) {
 
       # prepare for split and check kfs
@@ -179,6 +192,8 @@ moment_match.matrix <- function(x,
               call using apply.")
       }
       lwf <- as.vector(weights(psisf))
+#      lwf <- log(psisfp$x)
+
 
       if (is.null(log_prob_target_fun) && is.null(log_ratio_fun)) {
         update_properties <- list(target_type = "simple",

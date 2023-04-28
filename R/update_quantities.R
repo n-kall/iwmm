@@ -48,9 +48,11 @@ update_quantities <- function(draws, orig_log_prob_prop,
     )
   }
 
-  psis <- suppressWarnings(loo::psis(lw_new))
-  k <- psis$diagnostics$pareto_k
-  lw <- as.vector(weights(psis))
+  psis <- posterior::pareto_smooth(exp(lw_new), tail = "right", r_eff = 1)
+  k <- psis$diagnostics$k
+  lw <- as.vector(log(psis$x))
+  # normalize log weights
+  lw <- lw - matrixStats::logSumExp(lw)
 
   # gather results
   list(
