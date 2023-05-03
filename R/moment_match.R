@@ -116,14 +116,14 @@ moment_match.matrix <- function(x,
     }
 
 
-    lw_psis <- suppressWarnings(loo::psis(lw))
-    lw <- as.vector(weights(lw_psis))
-    k <- lw_psis$diagnostics$pareto_k
-
-#    lw_psis <- posterior::pareto_smooth(exp(lw), tail = "right", extra_diags = TRUE)
-#    lw <- log(lw_psis$x)
-#    k <- lw_psis$diagnostics$k
-
+    ## lw_psis <- suppressWarnings(loo::psis(lw))
+    ## lw_old <- as.vector(weights(lw_psis))
+    ## k <- lw_psis$diagnostics$pareto_k
+    
+    lw_psis <- posterior::pareto_smooth(exp(lw), tail = "right", extra_diags = TRUE, r_eff = 1)
+    lw <- log(lw_psis$x)
+    lw <- lw - matrixStats::logSumExp(lw)
+    k <- lw_psis$diagnostics$khat
 
     if (any(is.infinite(k))) {
       stop("Something went wrong, and encountered infinite Pareto k values..")
@@ -157,14 +157,12 @@ moment_match.matrix <- function(x,
   } else {
 
     lwf <- compute_lwf(draws, lw, expectation_fun, log_expectation_fun, ...)
-    psisf <- suppressWarnings(loo::psis(lwf))
-    kf <- psisf$diagnostics$pareto_k
+#    psisf <- suppressWarnings(loo::psis(lwf))
+#    kf <- psisf$diagnostics$pareto_k
 
-#    psisfp <- posterior:::pareto_smooth(exp(lwf), tail = "right", extra_diags = TRUE, r_eff = 1)
- #   kfp <- psisf$diagnostics$k
-
-#    print(kf)
-#    print(kfp)
+    psisf <- apply(lwf, 2, function(x) posterior:::pareto_smooth(exp(x), tail = "right", extra_diags = TRUE, r_eff = 1))
+    psisf <- do.call(mapply, c(cbind, psisf))    
+    kf <- as.numeric(psisf$diagnostics["khat", ])
 
     if (split) {
 
@@ -191,8 +189,8 @@ moment_match.matrix <- function(x,
               that return a matrix. As a workaround, you can wrap your function
               call using apply.")
       }
-      lwf <- as.vector(weights(psisf))
-#      lwf <- log(psisfp$x)
+      #lwf <- as.vector(weights(psisf))
+      lwf <- as.vector(log(psisf$x))
 
 
       if (is.null(log_prob_target_fun) && is.null(log_ratio_fun)) {
