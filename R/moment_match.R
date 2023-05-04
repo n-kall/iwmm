@@ -122,7 +122,7 @@ moment_match.matrix <- function(x,
 
     lw <- lw - matrixStats::logSumExp(lw)
     lw_psis <- posterior::pareto_smooth(exp(lw), tail = "right", extra_diags = TRUE, r_eff = 1)
-    lw <- log(lw_psis$x)
+    lw <- as.vector(log(lw_psis$x))
     k <- lw_psis$diagnostics$khat
 
     if (any(is.infinite(k))) {
@@ -160,7 +160,7 @@ moment_match.matrix <- function(x,
 #    psisf <- suppressWarnings(loo::psis(lwf))
 #    kf <- psisf$diagnostics$pareto_k
 
-    psisf <- apply(lwf, 2, function(x) posterior:::pareto_smooth(exp(x), tail = "right", extra_diags = TRUE, r_eff = 1))
+    psisf <- apply(lwf, 2, function(x) posterior::pareto_smooth(exp(x), tail = "right", extra_diags = TRUE, r_eff = 1))
     psisf <- do.call(mapply, c(cbind, psisf))
     kf <- as.numeric(psisf$diagnostics["khat", ])
 
