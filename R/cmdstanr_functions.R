@@ -13,7 +13,7 @@
 #' @param ... Further arguments passed to `moment_match.matrix`.
 #'
 #' @return Returns a list with 3 elements: transformed draws, updated
-#' importance weights, and the pareto k diagnostic value.
+#'   importance weights, and the pareto k diagnostic value.
 #'
 #' @export
 moment_match.CmdStanFit <- function(x,

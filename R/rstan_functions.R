@@ -1,5 +1,5 @@
-#' Generic importance weighted moment matching algorithm for `stanfit` objects.
-#' See additional arguments from `moment_match.matrix`
+#' Generic importance weighted moment matching algorithm for `stanfit`
+#' objects.  See additional arguments from `moment_match.matrix`
 #'
 #' @param x A fitted `stanfit` object.
 #' @param log_prob_target_fun Log density of the target.  The function
@@ -12,7 +12,7 @@
 #' @param ... Further arguments passed to `moment_match.matrix`.
 #'
 #' @return Returns a list with 3 elements: transformed draws, updated
-#' importance weights, and the pareto k diagnostic value.
+#'   importance weights, and the pareto k diagnostic value.
 #'
 #' @export
 moment_match.stanfit <- function(x,

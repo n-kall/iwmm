@@ -2,8 +2,8 @@
 % Please edit documentation in R/rstan_functions.R
 \name{moment_match.stanfit}
 \alias{moment_match.stanfit}
-\title{Generic importance weighted moment matching algorithm for \code{stanfit} objects.
-See additional arguments from \code{moment_match.matrix}}
+\title{Generic importance weighted moment matching algorithm for \code{stanfit}
+objects.  See additional arguments from \code{moment_match.matrix}}
 \usage{
 \method{moment_match}{stanfit}(
   x,
@@ -33,6 +33,6 @@ Returns a list with 3 elements: transformed draws, updated
 importance weights, and the pareto k diagnostic value.
 }
 \description{
-Generic importance weighted moment matching algorithm for \code{stanfit} objects.
-See additional arguments from \code{moment_match.matrix}
+Generic importance weighted moment matching algorithm for \code{stanfit}
+objects.  See additional arguments from \code{moment_match.matrix}
 }
