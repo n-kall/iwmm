@@ -48,8 +48,9 @@ update_quantities <- function(draws, orig_log_prob_prop,
     )
   }
 
+  lw_new <- lw_new - matrixStats::logSumExp(lw_new)
   psis <- posterior::pareto_smooth(exp(lw_new), tail = "right", r_eff = 1)
-  k <- psis$diagnostics$k
+  k <- psis$diagnostics$khat
   lw <- as.vector(log(psis$x))
   # normalize log weights
   lw <- lw - matrixStats::logSumExp(lw)

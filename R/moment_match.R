@@ -115,14 +115,14 @@ moment_match.matrix <- function(x,
            target density is equal to your proposal density.")
     }
 
+# previous version:
+#    lw_psis <- suppressWarnings(loo::psis(lw))
+#    lw <- as.vector(weights(lw_psis))
+#    k <- lw_psis$diagnostics$pareto_k
 
-    ## lw_psis <- suppressWarnings(loo::psis(lw))
-    ## lw_old <- as.vector(weights(lw_psis))
-    ## k <- lw_psis$diagnostics$pareto_k
-    
+    lw <- lw - matrixStats::logSumExp(lw)
     lw_psis <- posterior::pareto_smooth(exp(lw), tail = "right", extra_diags = TRUE, r_eff = 1)
     lw <- log(lw_psis$x)
-    lw <- lw - matrixStats::logSumExp(lw)
     k <- lw_psis$diagnostics$khat
 
     if (any(is.infinite(k))) {
@@ -161,7 +161,7 @@ moment_match.matrix <- function(x,
 #    kf <- psisf$diagnostics$pareto_k
 
     psisf <- apply(lwf, 2, function(x) posterior:::pareto_smooth(exp(x), tail = "right", extra_diags = TRUE, r_eff = 1))
-    psisf <- do.call(mapply, c(cbind, psisf))    
+    psisf <- do.call(mapply, c(cbind, psisf))
     kf <- as.numeric(psisf$diagnostics["khat", ])
 
     if (split) {
