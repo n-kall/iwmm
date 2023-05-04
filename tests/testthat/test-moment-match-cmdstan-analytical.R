@@ -1,10 +1,8 @@
-cmdstanr_available <- require(cmdstanr)
+test_that("moment_match.CmdStanFit matches analytical results", {
 
-# Run these tests only if cmdstanr is installed
-if (cmdstanr_available) {
+  skip_on_cran()
 
-
-stancode <- "data {
+  stancode <- "data {
   int<lower=0> N;
   vector[N] x;
   int<lower=0> prior_only;
@@ -39,93 +37,90 @@ stancode <- "data {
     compile = FALSE
   )
 
-stanmodel$compile(force_recompile = TRUE)
+  stanmodel$compile(force_recompile = TRUE)
 
-# Proposal = prior, target = posterior, ratio = likelihood
-# gaussian model, known sigma
+  # Proposal = prior, target = posterior, ratio = likelihood
+  # gaussian model, known sigma
 
-# generate data
-SEED <- 123
-set.seed(SEED)
-n <- as.integer(10)
-data_var <- 1
-x <- rnorm(n = n, mean = 2, sd = data_var)
+  # generate data
+  SEED <- 123
+  set.seed(SEED)
+  n <- as.integer(10)
+  data_var <- 1
+  x <- rnorm(n = n, mean = 2, sd = data_var)
 
-mu0 <- 0
-nu0 <- 10
-kappa0 <- 1
-sigma0 <- 1
-
-
-standata_full <- list(
-  N = n,
-  x = x,
-  prior_only = 0,
-  mu0 = mu0,
-  nu0 = nu0,
-  kappa0 = kappa0,
-  sigma0 = sigma0
-)
-
-standata_prior <- list(
-  N = n,
-  x = x,
-  prior_only = 1,
-  mu0 = mu0,
-  nu0 = nu0,
-  kappa0 = kappa0,
-  sigma0 = sigma0
-)
-
-# fit model (just sampling from prior and calculating log_lik)
-fit_full <- stanmodel$sample(
-  data = standata_full,
-  chains = 4,
-  iter_sampling = 1000,
-  iter_warmup = 1000,
-  refresh = 0,
-  seed = SEED
-)
-
-fit_prior <- stanmodel$sample(
-  data = standata_prior,
-  chains = 4,
-  iter_sampling = 1000,
-  iter_warmup = 1000,
-  refresh = 0,
-  seed = SEED
-)
-
-fit_prior$init_model_methods()
-
-# from Gelman et al., BDA3 p 68
-# mu ~ student_t(mu_n, sigma_n / kappa_n)
-# sigma_sq ~ inv_chi_square(nu_n, sigma_n)
+  mu0 <- 0
+  nu0 <- 10
+  kappa0 <- 1
+  sigma0 <- 1
 
 
-mu0 <- 0
-ybar <- mean(x)
-s_sq <- var(x)
-nu_n <- nu0 + n
-kappa_n <- kappa0 + n
+  standata_full <- list(
+    N = n,
+    x = x,
+    prior_only = 0,
+    mu0 = mu0,
+    nu0 = nu0,
+    kappa0 = kappa0,
+    sigma0 = sigma0
+  )
 
-mu_n <- kappa0 / kappa_n * mu0 + n / kappa_n * ybar
+  standata_prior <- list(
+    N = n,
+    x = x,
+    prior_only = 1,
+    mu0 = mu0,
+    nu0 = nu0,
+    kappa0 = kappa0,
+    sigma0 = sigma0
+  )
+
+  # fit model (just sampling from prior and calculating log_lik)
+  fit_full <- stanmodel$sample(
+    data = standata_full,
+    chains = 4,
+    iter_sampling = 1000,
+    iter_warmup = 1000,
+    refresh = 0,
+    seed = SEED
+  )
+
+  fit_prior <- stanmodel$sample(
+    data = standata_prior,
+    chains = 4,
+    iter_sampling = 1000,
+    iter_warmup = 1000,
+    refresh = 0,
+    seed = SEED
+  )
+
+  fit_prior$init_model_methods()
+
+  # from Gelman et al., BDA3 p 68
+  # mu ~ student_t(mu_n, sigma_n / kappa_n)
+  # sigma_sq ~ inv_chi_square(nu_n, sigma_n)
+
+
+  mu0 <- 0
+  ybar <- mean(x)
+  s_sq <- var(x)
+  nu_n <- nu0 + n
+  kappa_n <- kappa0 + n
+
+  mu_n <- kappa0 / kappa_n * mu0 + n / kappa_n * ybar
 
   sigma_sq_n <- (nu0 * sigma0^2 + (n - 1) * s_sq +
                    (kappa0 * n) / kappa_n * (ybar - mu0)^2) / nu_n
-sigma_sq_post_mean <- nu_n * sigma_sq_n / (nu_n - 2)
-sigma_sq_post_var <- 2 * nu_n^2 * sigma_sq_n^2 / ((nu_n - 2)^2 * (nu_n - 4))
-sigma_sq_post_sd <- sqrt(sigma_sq_post_var)
+  sigma_sq_post_mean <- nu_n * sigma_sq_n / (nu_n - 2)
+  sigma_sq_post_var <- 2 * nu_n^2 * sigma_sq_n^2 / ((nu_n - 2)^2 * (nu_n - 4))
+  sigma_sq_post_sd <- sqrt(sigma_sq_post_var)
 
-mu_post_mean <- mu_n
-mu_post_var <- (sigma_sq_n / kappa_n) * (nu_n / (nu_n - 2))
-mu_post_sd <- sqrt(mu_post_var)
+  mu_post_mean <- mu_n
+  mu_post_var <- (sigma_sq_n / kappa_n) * (nu_n / (nu_n - 2))
+  mu_post_sd <- sqrt(mu_post_var)
 
-mean_analytical_prior <- c(mu = mu_n, sigma_sq = sigma_sq_post_mean)
-sd_analytical_prior <- c(mu = mu_post_sd, sigma_sq = sqrt(sigma_sq_post_var))
-
-
-test_that("moment_match.CmdStanFit matches analytical results", {
+  mean_analytical_prior <- c(mu = mu_n, sigma_sq = sigma_sq_post_mean)
+  sd_analytical_prior <- c(mu = mu_post_sd, sigma_sq = sqrt(sigma_sq_post_var))
 
   # ratio = jointlikelihood
   joint_log_lik <- function(draws, fit, ...) {
@@ -161,7 +156,7 @@ test_that("moment_match.CmdStanFit matches analytical results", {
     posterior::as_draws_matrix(draws_mm_prior),
     2,
     function(x) sqrt(var_weighted(x = x, w = weights_mm_prior))
-    )
+  )
 
   expect_equal(
     mean_mm_prior[c(1, 2)],
